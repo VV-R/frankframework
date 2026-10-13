@@ -1,0 +1,59 @@
+<Configuration
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="https://schemas.frankframework.org/FrankConfig.xsd"
+	active="true">
+  <Adapter name="TestCamel">
+    <Receiver name="testReceiver">
+      <ApiListener name="testListener" uriPattern="camel-dns"/>
+    </Receiver>
+    <Pipeline>
+		<EchoPipe name="helloWorld" getInputFromFixedValue="frankframework.org"/>
+		<PutInSessionPipe name="CamelDnsDomain" sessionKey="wearefrank.org"/>
+		<Pipe
+			name="camel-pipe" className="org.frankframework.pipes.CamelPipe"
+			routesSource="camelRoutes.xml"
+			endpointUri="direct:in-dns"
+		/>
+    </Pipeline>
+  </Adapter>
+	<Adapter name="TestCamelIn">
+		<Receiver name="testReceiver">
+			<ApiListener name="testListener" uriPattern="camel-dns-in" methods="put,post" allowAllParams="false"/>
+		</Receiver>
+		<Pipeline>
+			<Pipe
+				name="camel-pipe" className="org.frankframework.pipes.CamelPipe"
+				routesSource="camelRoutes.xml"
+				endpointUri="direct:in-dns"
+			/>
+		</Pipeline>
+	</Adapter>
+	<Adapter name="TestCamelDocker">
+		<Receiver name="testReceiver">
+			<ApiListener name="testListener" uriPattern="docker-in"/>
+		</Receiver>
+		<Pipeline>
+			<Pipe
+				name="camel-pipe" className="org.frankframework.pipes.CamelPipe"
+				routesSource="camelRoutes.xml"
+				endpointUri="direct:in-docker"
+			/>
+		</Pipeline>
+	</Adapter>
+	<Adapter name="TestCamelLog">
+		<Receiver name="testReceiver">
+			<ApiListener name="testListener" uriPattern="camel-log"/>
+		</Receiver>
+		<Pipeline>
+			<EchoPipe
+				name="helloWorld"
+				getInputFromFixedValue="Hello to Camel from Frank!"
+			/>
+			<Pipe
+				name="camel-pipe" className="org.frankframework.pipes.CamelPipe"
+				routesSource="camelRoutes.xml"
+				endpointUri="direct:in-log"
+			/>
+		</Pipeline>
+	</Adapter>
+</Configuration>

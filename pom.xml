@@ -478,6 +478,12 @@
 				<version>${project.version}</version>
 				<type>pom</type>
 			</dependency>
+			<dependency>
+				<groupId>org.frankframework</groupId>
+				<artifactId>frankframework-camel</artifactId>
+				<version>${project.version}</version>
+				<type>pom</type>
+			</dependency>
 
 			<!-- SPRING to force versions -->
 			<dependency>
@@ -1709,6 +1715,8 @@
 
 				<module>bootable-runner</module>
 				<module>build-templates</module>
+
+				<module>camel</module>
 			</modules>
 		</profile>
 		<profile>

@@ -1,0 +1,20 @@
+<routes xmlns="http://camel.apache.org/schema/xml-io">
+	<route id="log">
+		 <from uri="direct:in-log"/>
+		 <to uri="log:org.apache.camel"/>
+	</route>
+	<route id="IPCheck">
+		<from uri="direct:in-dns"/>
+		<setHeader name="CamelDnsDomain">
+			<simple>${body}</simple>
+		</setHeader>
+		<to uri="dns:ip"/>
+		<convertBodyTo type="String"/>
+	</route>
+	<route id="docker">
+		<!-- does not work (yet) -->
+		<from uri="direct:in-docker"/>
+		<to uri="docker://info?host=/var/run/docker.sock"/>
+		<to uri="log:info"/>
+	</route>
+</routes>
