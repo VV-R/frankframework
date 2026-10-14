@@ -41,6 +41,9 @@ import org.frankframework.stream.Message;
 import org.frankframework.util.SpringUtils;
 
 
+import org.frankframework.support.FrankParameterListRepository;
+
+
 /**
  * Pipe that used to test reading a resource from the local (plugin) classpath.
  */
@@ -50,6 +53,7 @@ public class CamelPipe extends FixedForwardPipe {
 	private CamelXmlRoutesBuilderLoader camelXmlRoutesBuilderLoader;
 	private String routesSource;
 	private String endpointUri;
+	private FrankParameterListRepository camelVariableRepository;
 
 	public void setCamelContext(SpringCamelContext camelContext) {
 		this.camelContext = camelContext;
@@ -69,6 +73,9 @@ public class CamelPipe extends FixedForwardPipe {
 		super.configure();
 
 		camelContext = SpringUtils.createBean(getApplicationContext(), SpringCamelContext.class);
+
+		camelVariableRepository = new FrankParameterListRepository(getParameterList());
+		camelContext.getRegistry().bind(camelVariableRepository.getId(), camelVariableRepository);
 
 		producerTemplate = this.camelContext.createProducerTemplate();
 		camelXmlRoutesBuilderLoader = new CamelXmlRoutesBuilderLoader();
@@ -120,6 +127,9 @@ public class CamelPipe extends FixedForwardPipe {
 
 	@Override
 	public PipeRunResult doPipe(Message message, PipeLineSession session) throws PipeRunException {
+		camelVariableRepository.setMessage(message);
+		camelVariableRepository.setSession(session);
+
 		try {
 			Object result = producerTemplate.sendBodyAndHeaders(
 				endpointUri,

@@ -56,4 +56,18 @@
 			/>
 		</Pipeline>
 	</Adapter>
+	<Adapter name="TestCamelVariables">
+		<Receiver name="testReceiver">
+			<ApiListener name="testListener" uriPattern="camel-variables"/>
+		</Receiver>
+		<Pipeline>
+			<Pipe
+				name="camel-pipe" className="org.frankframework.pipes.CamelPipe"
+				routesSource="camelRoutes.xml"
+				endpointUri="direct:in-variables"
+			>
+				<param name="hello" value="world"/>
+			</Pipe>
+		</Pipeline>
+	</Adapter>
 </Configuration>

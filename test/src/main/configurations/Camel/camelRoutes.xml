@@ -17,4 +17,11 @@
 		<to uri="docker://info?host=/var/run/docker.sock"/>
 		<to uri="log:info"/>
 	</route>
+	<route id="variables">
+		<from uri="direct:in-variables"/>
+		<setBody>
+			<variable>frank-param:hello</variable>
+		</setBody>
+		<to uri="log:org.apache.camel"/>
+	</route>
 </routes>
