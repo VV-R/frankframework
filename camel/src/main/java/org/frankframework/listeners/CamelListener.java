@@ -70,7 +70,7 @@ public class CamelListener<M> implements IPushingListener, ReceiverAware {
 
 	@Override
 	public Message extractMessage(@NonNull RawMessageWrapper rawMessage, @NonNull Map context) throws ListenerException {
-		return null;
+		return rawMessage.getRawMessage();
 	}
 
 	@Override
