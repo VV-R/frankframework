@@ -82,11 +82,10 @@ public class CamelListener implements IPushingListener<Message>, ReceiverAware<M
 	public void configure() throws ConfigurationException {
 //		getApplicationContext().getAutowireCapableBeanFactory().autowireBean(this);
 
-		CamelXmlRoutesBuilderLoader camelXmlRoutesBuilderLoader = new CamelXmlRoutesBuilderLoader();
 		RouteBuilder routesBuilder;
-		try {
+		try (CamelXmlRoutesBuilderLoader camelXmlRoutesBuilderLoader = new CamelXmlRoutesBuilderLoader()) {
 			routesBuilder = camelXmlRoutesBuilderLoader.doLoadRouteBuilder(CamelUtils.getResource(routesSource));
-		} catch (Exception e) {
+		} catch (Exception e) { // could IOException
 			throw new ConfigurationException(e);
 		}
 
