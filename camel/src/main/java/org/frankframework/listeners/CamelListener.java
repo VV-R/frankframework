@@ -7,7 +7,6 @@ import org.apache.camel.dsl.xml.io.CamelXmlRoutesBuilderLoader;
 
 import org.frankframework.CamelUtils;
 import org.frankframework.configuration.ConfigurationException;
-import org.frankframework.core.IListener;
 import org.frankframework.core.IMessageHandler;
 import org.frankframework.core.IPushingListener;
 import org.frankframework.core.IbisExceptionListener;
@@ -26,14 +25,15 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 
+import java.io.IOException;
 import java.util.Map;
 
-public class CamelListener<M> implements IPushingListener, ReceiverAware {
+public class CamelListener implements IPushingListener<Message>, ReceiverAware<Message> {
 	private String name;
 	private ApplicationContext applicationContext;
-	private Receiver receiver;
+	private Receiver<Message> receiver;
 	private String uri;
-	private IMessageHandler<M> handler;
+	private IMessageHandler<Message> handler;
 	private IbisExceptionListener listener;
 	private String routesSource;
 	private CamelContext camelContext;
@@ -50,11 +50,11 @@ public class CamelListener<M> implements IPushingListener, ReceiverAware {
 		return uri;
 	}
 
-	public void setReceiver(Receiver receiver) {
+	public void setReceiver(Receiver<Message> receiver) {
 		this.receiver = receiver;
 	}
 
-	public Receiver getReceiver() {
+	public Receiver<Message> getReceiver() {
 		return receiver;
 	}
 
@@ -69,12 +69,12 @@ public class CamelListener<M> implements IPushingListener, ReceiverAware {
 	}
 
 	@Override
-	public Message extractMessage(@NonNull RawMessageWrapper rawMessage, @NonNull Map context) throws ListenerException {
+	public Message extractMessage(@NonNull RawMessageWrapper<Message> rawMessage, @NonNull Map<String,Object> context) throws ListenerException {
 		return rawMessage.getRawMessage();
 	}
 
 	@Override
-	public void afterMessageProcessed(PipeLineResult processResult, RawMessageWrapper rawMessage, PipeLineSession pipeLineSession) throws ListenerException {
+	public void afterMessageProcessed(PipeLineResult processResult, RawMessageWrapper<Message> rawMessage, PipeLineSession pipeLineSession) throws ListenerException {
 
 	}
 
@@ -101,7 +101,7 @@ public class CamelListener<M> implements IPushingListener, ReceiverAware {
 	}
 
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+	public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}
 
@@ -121,11 +121,11 @@ public class CamelListener<M> implements IPushingListener, ReceiverAware {
 	}
 
 	public void processMessage(Message message, PipeLineSession session) throws ListenerException {
-		receiver.processRequest(this, new MessageWrapper(message, session.getMessageId(), null), session);
+		receiver.processRequest(this, new MessageWrapper<Message>(message, session.getMessageId(), null), session);
 	}
 
 	@Override
-	public void setHandler(@NonNull IMessageHandler handler) {
+	public void setHandler(@NonNull IMessageHandler<Message> handler) {
 		this.handler = handler;
 	}
 
@@ -135,7 +135,7 @@ public class CamelListener<M> implements IPushingListener, ReceiverAware {
 	}
 
 	@Override
-	public RawMessageWrapper wrapRawMessage(@NonNull Object rawMessage, @NonNull PipeLineSession session) throws ListenerException {
-		return new RawMessageWrapper(rawMessage);
+	public RawMessageWrapper<Message> wrapRawMessage(@NonNull Message rawMessage, @NonNull PipeLineSession session) throws ListenerException {
+		return new RawMessageWrapper<Message>(rawMessage);
 	}
 }

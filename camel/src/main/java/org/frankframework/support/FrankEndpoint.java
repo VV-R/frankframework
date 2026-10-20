@@ -10,6 +10,8 @@ import org.apache.camel.support.DefaultEndpoint;
 
 import org.frankframework.listeners.CamelListener;
 
+import org.jspecify.annotations.NonNull;
+
 
 public class FrankEndpoint extends DefaultEndpoint {
 	private CamelListener listener;
@@ -20,12 +22,12 @@ public class FrankEndpoint extends DefaultEndpoint {
 	}
 
 	@Override
-	public Producer createProducer() throws Exception {
+	public @NonNull Producer createProducer() throws Exception {
 		return new FrankProducer(listener, this);
 	}
 
 	@Override
-	public Consumer createConsumer(Processor processor) throws Exception {
+	public @NonNull Consumer createConsumer(@NonNull Processor processor) throws Exception {
 		throw new NotSupportedException();
 	}
 }
