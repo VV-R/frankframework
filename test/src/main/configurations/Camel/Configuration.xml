@@ -56,4 +56,14 @@
 			/>
 		</Pipeline>
 	</Adapter>
+	<Adapter name="TestCamelListener">
+		<Receiver name="testReceiver">
+			<Listener className="org.frankframework.listeners.CamelListener" routesSource="camelListenerRoutes.xml"/>
+		</Receiver>
+		<Pipeline>
+			<SenderPipe name="sender">
+				<LogSender></LogSender>
+			</SenderPipe>
+		</Pipeline>
+	</Adapter>
 </Configuration>
