@@ -30,10 +30,10 @@ public class FrankProducer extends DefaultProducer {
 			throw new Exception("Message body should not be null");
 		}
 
-		Message frankMsg = new Message(
-			exchange.getMessage().getBody().toString(),
-			new MessageContext((Map<String, Serializable>)(Map)exchange.getMessage().getHeaders())
-		);
+		Message frankMsg = Message.asMessage(exchange.getMessage().getBody());
+		// This is the only way to set the message context at the moment.
+		frankMsg.getContext().putAll((Map<String, Serializable>)(Map)exchange.getMessage().getHeaders());
+
 //		exchange.getMessage().getMessageId();
 		camelListener.processMessage(frankMsg, session);
 	}
