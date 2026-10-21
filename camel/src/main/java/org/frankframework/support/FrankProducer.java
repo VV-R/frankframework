@@ -26,10 +26,6 @@ public class FrankProducer extends DefaultProducer {
 		PipeLineSession session = new PipeLineSession();
 		session.put(PipeLineSession.MESSAGE_ID_KEY, exchange.getMessage().getMessageId());
 
-		if (exchange.getMessage().getBody() == null) {
-			throw new Exception("Message body should not be null");
-		}
-
 		Message frankMsg = Message.asMessage(exchange.getMessage().getBody());
 		// This is the only way to set the message context at the moment.
 		frankMsg.getContext().putAll((Map<String, Serializable>)(Map)exchange.getMessage().getHeaders());
