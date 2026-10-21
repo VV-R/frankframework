@@ -4,6 +4,6 @@
 		<setBody>
 			<constant>Hello from Camel to Frank</constant>
 		</setBody>
-		<to uri="frank:to-frank"/>
+		<to uri="frank:camelListenerOne"/>
 	</route>
 </routes>

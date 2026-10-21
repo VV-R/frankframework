@@ -91,7 +91,7 @@ public class CamelListener implements IPushingListener<Message>, ReceiverAware<M
 
 		camelContext = CamelUtils.createCamelContext(getApplicationContext());
 		camelContext.addComponent("frank", new FrankComponent());
-		camelContext.getRegistry().bind("listener", this);
+		camelContext.getRegistry().bind(name, this);
 		try {
 			camelContext.addRoutes(routesBuilder);
 		} catch (Exception e) {

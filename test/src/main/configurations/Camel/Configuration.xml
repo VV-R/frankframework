@@ -58,7 +58,7 @@
 	</Adapter>
 	<Adapter name="TestCamelListener">
 		<Receiver name="testReceiver">
-			<Listener className="org.frankframework.listeners.CamelListener" routesSource="camelListenerRoutes.xml"/>
+			<Listener className="org.frankframework.listeners.CamelListener" routesSource="camelListenerRoutes.xml" name="camelListenerOne"/>
 		</Receiver>
 		<Pipeline>
 			<SenderPipe name="sender">
