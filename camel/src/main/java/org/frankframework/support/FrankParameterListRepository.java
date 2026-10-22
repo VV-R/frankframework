@@ -56,15 +56,11 @@ public class FrankParameterListRepository implements VariableRepository {
 	@Override
 	public void setVariable(String name, Object value) {
 		// maybe this one should be disabled
-		if ((value instanceof String)) {
-			throw new RuntimeException("value must be of type String");
-		}
-		parameterList.add(new Parameter(name, (String) value));
+		throw new RuntimeException("not supported");
 	}
 
 	@Override
 	public Object removeVariable(String name) {
-		IParameter param = parameterList.remove(name);
-		return param == null ? null : param.getValue();
+		throw new RuntimeException("not supported");
 	}
 }
