@@ -30,7 +30,6 @@ public class FrankProducer extends DefaultProducer {
 		// This is the only way to set the message context at the moment.
 		frankMsg.getContext().putAll((Map<String, Serializable>)(Map)exchange.getMessage().getHeaders());
 
-//		exchange.getMessage().getMessageId();
 		camelListener.processMessage(frankMsg, session);
 	}
 }
