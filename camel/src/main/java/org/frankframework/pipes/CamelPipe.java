@@ -23,6 +23,8 @@ import java.net.URL;
 import java.util.Map;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.Endpoint;
+import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
@@ -121,13 +123,24 @@ public class CamelPipe extends FixedForwardPipe {
 	@Override
 	public PipeRunResult doPipe(Message message, PipeLineSession session) throws PipeRunException {
 		try {
-			Object result = producerTemplate.sendBodyAndHeaders(
-				endpointUri,
-				ExchangePattern.InOut,
-				message.asString(),
-				serializeMap(message.getContext().getAll())
-			);
-			Message msg = Message.asMessage(result);
+			Endpoint endpoint = camelContext.getEndpoint(endpointUri);
+			if (endpoint == null)
+				throw new PipeRunException(
+					this, String.format("Could not find endpoint: \"%s\"", endpointUri)
+				);
+			Exchange exchange = endpoint.createExchange(ExchangePattern.InOut);
+			String messageId = session.getMessageId();
+			if (messageId == null)
+				throw new PipeRunException(this, "Pipe line session message id should not be null");
+			exchange.setExchangeId(messageId);
+			org.apache.camel.Message inMsg = exchange.getIn();
+			inMsg.setHeaders(serializeMap(message.getContext().getAll()));
+			inMsg.setBody(message.asString());
+//			ExchangeHelper.extractResultBody may be useful
+			Exchange result = producerTemplate.send(endpoint, exchange);
+			Object resultBody = result.getOut().getBody();
+
+			Message msg = Message.asMessage(resultBody);
 			return new PipeRunResult(getSuccessForward(), msg);
 		} catch (Exception e) {
 			throw new PipeRunException(this, "something went wrong relaying message to Camel", e);
