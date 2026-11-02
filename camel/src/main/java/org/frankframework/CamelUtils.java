@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+@UtilityClass
 public class CamelUtils {
 	public static SpringCamelContext createCamelContext(ApplicationContext applicationContext) {
 		return SpringUtils.createBean(applicationContext, SpringCamelContext.class);
