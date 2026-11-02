@@ -28,6 +28,12 @@ import org.springframework.context.ApplicationContext;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * Listener that allows a {@link Receiver} to receive messages from a Camel route.
+ * The receiver can be targeted in a Camel route by the following URI: <code>frank:{@link CamelListener#name}</code>
+ *
+ * @author Ruben van Voorden
+ */
 public class CamelListener implements IPushingListener<Message>, ReceiverAware<Message> {
 	private String name;
 	private ApplicationContext applicationContext;
@@ -103,6 +109,9 @@ public class CamelListener implements IPushingListener<Message>, ReceiverAware<M
 		return name;
 	}
 
+	/**
+	 * Sets the listener name used in a Camel configuration to refer to the listener. e.g: <code>to("frank:{name}")</code>.
+	 */
 	@Override
 	public void setName(String name) {
 		this.name = name;
@@ -112,6 +121,9 @@ public class CamelListener implements IPushingListener<Message>, ReceiverAware<M
 		receiver.processRequest(this, new MessageWrapper<Message>(message, session.getMessageId(), null), session);
 	}
 
+	/**
+	 * Sets the message handler. {@link CamelListener#handler} is currently not being used, but its setter and getter are required by IPushingListener.
+	 */
 	@Override
 	public void setHandler(@NonNull IMessageHandler<Message> handler) {
 		this.handler = handler;
