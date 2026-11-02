@@ -22,6 +22,9 @@ import org.frankframework.listeners.CamelListener;
 
 import java.util.Map;
 
+/**
+ * The FrankComponent is for binding {@link CamelListener}s to Camel message exchanges based on {@link CamelListener#name} attribute.
+ */
 public class FrankComponent extends DefaultComponent {
 	@Override
 	protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
