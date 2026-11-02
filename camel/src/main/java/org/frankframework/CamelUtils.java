@@ -1,5 +1,7 @@
 package org.frankframework;
 
+import lombok.experimental.UtilityClass;
+
 import org.apache.camel.spi.Resource;
 import org.apache.camel.spring.SpringCamelContext;
 
