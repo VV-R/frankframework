@@ -29,6 +29,9 @@ import org.frankframework.stream.MessageContext;
 import java.io.Serializable;
 import java.util.Map;
 
+/**
+ * Frank producer. For sending messages to a {@link org.frankframework.receivers.FrankListener}
+ */
 public class FrankProducer extends DefaultProducer {
 	private CamelListener camelListener;
 
