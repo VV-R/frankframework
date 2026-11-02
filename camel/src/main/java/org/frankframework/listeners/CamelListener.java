@@ -32,7 +32,6 @@ public class CamelListener implements IPushingListener<Message>, ReceiverAware<M
 	private String name;
 	private ApplicationContext applicationContext;
 	private Receiver<Message> receiver;
-	private String uri;
 	private IMessageHandler<Message> handler;
 	private IbisExceptionListener listener;
 	private String routesSource;
@@ -40,14 +39,6 @@ public class CamelListener implements IPushingListener<Message>, ReceiverAware<M
 
 	public void setRoutesSource(String routesSource) {
 		this.routesSource = routesSource;
-	}
-
-	public void setUri(String uri) {
-		this.uri = uri;
-	}
-
-	public String getUri() {
-		return uri;
 	}
 
 	public void setReceiver(Receiver<Message> receiver) {
