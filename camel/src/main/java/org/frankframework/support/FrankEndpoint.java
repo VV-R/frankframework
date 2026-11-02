@@ -26,7 +26,8 @@ public class FrankEndpoint extends DefaultEndpoint {
 	}
 
 	@Override
-	public @NonNull Consumer createConsumer(@NonNull Processor processor) throws Exception {
-		throw new NotSupportedException();
+	public @NonNull Consumer createConsumer(@NonNull Processor processor) throws UnsupportedOperationException {
+		// inspired from: https://github.com/apache/camel/blob/30afcab269af9841d34bb6d8058bc0b0016a1c05/components/camel-tika/src/main/java/org/apache/camel/component/tika/TikaEndpoint.java#L69
+		throw new UnsupportedOperationException("Consumer is not supported for Frank endpoint");
 	}
 }
