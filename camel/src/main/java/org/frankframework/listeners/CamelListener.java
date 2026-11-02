@@ -75,7 +75,7 @@ public class CamelListener implements IPushingListener<Message>, ReceiverAware<M
 
 	@Override
 	public void afterMessageProcessed(PipeLineResult processResult, RawMessageWrapper<Message> rawMessage, PipeLineSession pipeLineSession) throws ListenerException {
-
+		// Do nothing
 	}
 
 	@Override
