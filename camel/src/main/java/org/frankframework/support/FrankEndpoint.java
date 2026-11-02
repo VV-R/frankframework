@@ -12,7 +12,6 @@ import org.frankframework.listeners.CamelListener;
 
 import org.jspecify.annotations.NonNull;
 
-
 public class FrankEndpoint extends DefaultEndpoint {
 	private CamelListener listener;
 
