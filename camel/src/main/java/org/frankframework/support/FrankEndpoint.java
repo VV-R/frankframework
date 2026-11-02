@@ -28,6 +28,9 @@ import org.frankframework.listeners.CamelListener;
 
 import org.jspecify.annotations.NonNull;
 
+/**
+ * Send messages to a Frank!Framework configuration.
+ */
 public class FrankEndpoint extends DefaultEndpoint {
 	private CamelListener listener;
 
