@@ -52,6 +52,7 @@ public class CamelPipe extends FixedForwardPipe {
 	private CamelXmlRoutesBuilderLoader camelXmlRoutesBuilderLoader;
 	private String routesSource;
 	private String endpointUri;
+	private Endpoint endpoint;
 
 	public void setCamelContext(SpringCamelContext camelContext) {
 		this.camelContext = camelContext;
@@ -80,6 +81,8 @@ public class CamelPipe extends FixedForwardPipe {
 		} catch (Exception e) {
 			throw new ConfigurationException(e);
 		}
+
+		endpoint = camelContext.getEndpoint(endpointUri);
 	}
 
 	private Resource getRouteBuilderResource() throws Exception {
@@ -123,11 +126,6 @@ public class CamelPipe extends FixedForwardPipe {
 	@Override
 	public PipeRunResult doPipe(Message message, PipeLineSession session) throws PipeRunException {
 		try {
-			Endpoint endpoint = camelContext.getEndpoint(endpointUri);
-			if (endpoint == null)
-				throw new PipeRunException(
-					this, String.format("Could not find endpoint: \"%s\"", endpointUri)
-				);
 			Exchange exchange = endpoint.createExchange(ExchangePattern.InOut);
 			String messageId = session.getMessageId();
 			if (messageId == null)
