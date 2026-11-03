@@ -96,7 +96,9 @@ public class CamelListener implements IPushingListener<Message>, ReceiverAware<M
 		try {
 			camelContext.addRoutes(routesBuilder);
 		} catch (Exception e) {
-			throw new ConfigurationException(e);
+			throw new ConfigurationException(
+				"something went wrong while adding routes to CamelContext", e
+			);
 		}
 	}
 
