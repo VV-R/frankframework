@@ -43,7 +43,6 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -148,10 +147,12 @@ public class CamelListener implements IPushingListener<Message>, ReceiverAware<M
 		this.listener = listener;
 	}
 
+	@Override
 	public void setReceiver(Receiver<Message> receiver) {
 		this.receiver = receiver;
 	}
 
+	@Override
 	public Receiver<Message> getReceiver() {
 		return receiver;
 	}
