@@ -27,7 +27,12 @@ import java.util.Map;
  */
 public class FrankComponent extends DefaultComponent {
 	@Override
-	protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
+	protected Endpoint createEndpoint(
+		String uri,
+		// the part after the scheme and before the query parameters (if any), e.g. "scheme:{remaining}", like the path
+		String remaining,
+		Map<String, Object> parameters
+	) throws Exception {
 		CamelListener listener = getCamelContext().getRegistry().lookupByNameAndType(remaining, CamelListener.class);
 		if (listener == null) {
 			throw new IllegalStateException("Can not find CamelListener with name [" + remaining + "]");
