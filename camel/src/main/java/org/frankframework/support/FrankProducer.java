@@ -1,0 +1,54 @@
+/*
+   Copyright 2026 WeAreFrank!
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+package org.frankframework.support;
+
+import org.apache.camel.Endpoint;
+import org.apache.camel.Exchange;
+import org.apache.camel.Producer;
+import org.apache.camel.support.DefaultProducer;
+
+import org.frankframework.core.PipeLineSession;
+import org.frankframework.listeners.CamelListener;
+import org.frankframework.stream.Message;
+import org.frankframework.stream.MessageContext;
+
+import java.io.Serializable;
+import java.util.Map;
+
+/**
+ * Frank producer. For sending messages to a {@link org.frankframework.receivers.FrankListener}
+ */
+public class FrankProducer extends DefaultProducer {
+	private CamelListener camelListener;
+
+	protected FrankProducer(CamelListener listener, Endpoint endpoint) {
+		super(endpoint);
+		camelListener = listener;
+	}
+
+	@Override
+	public void process(Exchange exchange) throws Exception {
+		PipeLineSession session = new PipeLineSession();
+		session.put(PipeLineSession.MESSAGE_ID_KEY, exchange.getMessage().getMessageId());
+
+		Message frankMsg = Message.asMessage(exchange.getMessage().getBody());
+		// This is the only way to set the message context at the moment.
+		frankMsg.getContext().putAll((Map<String, Serializable>)(Map)exchange.getMessage().getHeaders());
+
+		camelListener.processMessage(frankMsg, session);
+	}
+}
