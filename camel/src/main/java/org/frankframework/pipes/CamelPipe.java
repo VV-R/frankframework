@@ -23,6 +23,8 @@ import java.net.URL;
 import java.util.Map;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.Endpoint;
+import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
@@ -33,6 +35,7 @@ import org.apache.camel.support.ResourceSupport;
 
 import org.frankframework.configuration.ConfigurationException;
 import org.frankframework.core.Adapter;
+import org.frankframework.core.PipeLine;
 import org.frankframework.core.PipeLineSession;
 import org.frankframework.core.PipeRunException;
 import org.frankframework.core.PipeRunResult;
@@ -50,6 +53,7 @@ public class CamelPipe extends FixedForwardPipe {
 	private CamelXmlRoutesBuilderLoader camelXmlRoutesBuilderLoader;
 	private String routesSource;
 	private String endpointUri;
+	private Endpoint endpoint;
 
 	public void setCamelContext(SpringCamelContext camelContext) {
 		this.camelContext = camelContext;
@@ -78,6 +82,8 @@ public class CamelPipe extends FixedForwardPipe {
 		} catch (Exception e) {
 			throw new ConfigurationException(e);
 		}
+
+		endpoint = camelContext.getEndpoint(endpointUri);
 	}
 
 	private Resource getRouteBuilderResource() throws Exception {
@@ -118,17 +124,41 @@ public class CamelPipe extends FixedForwardPipe {
 		return result;
 	}
 
+	private Exchange createExchangeFromSession(PipeLineSession session) throws PipeRunException {
+		Exchange exchange = endpoint.createExchange(ExchangePattern.InOut);
+
+		String messageId = session.getMessageId();
+		if (messageId == null)
+			throw new PipeRunException(this, "Pipe line session message id should not be null");
+		exchange.setExchangeId(messageId);
+
+		return exchange;
+	}
+
+	private void setupExchangeInMessage(Exchange exchange, Message message) throws IOException {
+		org.apache.camel.Message inMsg = exchange.getIn();
+		inMsg.setHeaders(serializeMap(message.getContext().getAll()));
+		inMsg.setBody(message.asString());
+	}
+
+	private Message convertResponseExchangeToFrankMessage(Exchange exchange) {
+//		ExchangeHelper.extractResultBody may be useful
+		Object resultBody = exchange.getOut().getBody();
+		return Message.asMessage(resultBody);
+	}
+
 	@Override
 	public PipeRunResult doPipe(Message message, PipeLineSession session) throws PipeRunException {
 		try {
-			Object result = producerTemplate.sendBodyAndHeaders(
-				endpointUri,
-				ExchangePattern.InOut,
-				message.asString(),
-				serializeMap(message.getContext().getAll())
+			Exchange exchange = createExchangeFromSession(session);
+
+			setupExchangeInMessage(exchange, message);
+
+			Exchange responseExchange = producerTemplate.send(endpoint, exchange);
+
+			return new PipeRunResult(
+				getSuccessForward(), convertResponseExchangeToFrankMessage(responseExchange)
 			);
-			Message msg = Message.asMessage(result);
-			return new PipeRunResult(getSuccessForward(), msg);
 		} catch (Exception e) {
 			throw new PipeRunException(this, "something went wrong relaying message to Camel", e);
 		}
