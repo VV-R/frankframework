@@ -47,6 +47,8 @@ import org.frankframework.parameters.IParameter;
 import org.frankframework.stream.Message;
 import org.frankframework.util.SpringUtils;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Pipe that used to test reading a resource from the local (plugin) classpath.
@@ -141,7 +143,7 @@ public class CamelPipe extends FixedForwardPipe {
 	}
 
 	@Override
-	public PipeRunResult doPipe(Message message, PipeLineSession session) throws PipeRunException {
+	public @NonNull PipeRunResult doPipe(@NonNull Message message, @NonNull PipeLineSession session) throws PipeRunException {
 		try {
 			Exchange exchange = createExchangeFromSession(session);
 
