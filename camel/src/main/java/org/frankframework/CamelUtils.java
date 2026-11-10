@@ -25,6 +25,7 @@ import org.apache.camel.support.ResourceSupport;
 
 import org.frankframework.util.SpringUtils;
 
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
@@ -51,7 +52,7 @@ public class CamelUtils {
 			}
 
 			@Override
-			public InputStream getInputStream() throws IOException {
+			public @NonNull InputStream getInputStream() throws IOException {
 				return url.openStream();
 			}
 		};
