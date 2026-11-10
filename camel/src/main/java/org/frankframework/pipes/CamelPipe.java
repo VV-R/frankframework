@@ -37,6 +37,7 @@ import org.apache.camel.spi.Resource;
 import org.apache.camel.spring.SpringCamelContext;
 import org.apache.camel.support.ResourceSupport;
 
+import org.frankframework.CamelUtils;
 import org.frankframework.configuration.ConfigurationException;
 import org.frankframework.core.Adapter;
 import org.frankframework.core.PipeLine;
@@ -81,24 +82,8 @@ public class CamelPipe extends FixedForwardPipe {
 		endpoint = camelContext.getEndpoint(endpointUri);
 	}
 
-	private Resource getRouteBuilderResource() throws Exception {
-		URL url = org.frankframework.util.ClassLoaderUtils.getResourceURL(routesSource);
-
-		return new ResourceSupport("jar", url.getFile()) {
-			@Override
-			public boolean exists() {
-				return true;
-			}
-
-			@Override
-			public InputStream getInputStream() throws IOException {
-				return url.openStream();
-			}
-		};
-	}
-
 	private RouteBuilder getRouteBuilder() throws Exception {
-		Resource resource = getRouteBuilderResource();
+		Resource resource = CamelUtils.getResource(routesSource);
 		return camelXmlRoutesBuilderLoader.doLoadRouteBuilder(resource);
 	}
 
