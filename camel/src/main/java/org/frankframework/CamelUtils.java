@@ -18,23 +18,76 @@ package org.frankframework;
 
 import lombok.experimental.UtilityClass;
 
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.spi.Resource;
 import org.apache.camel.spring.SpringCamelContext;
 
 import org.apache.camel.support.ResourceSupport;
 
+import org.frankframework.support.FrankComponent;
 import org.frankframework.util.SpringUtils;
 
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.Lifecycle;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.stream.Stream;
 
 @UtilityClass
 public class CamelUtils {
 	public static SpringCamelContext createCamelContext(ApplicationContext applicationContext) {
-		return SpringUtils.createBean(applicationContext, SpringCamelContext.class);
+		boolean setup = false;
+
+		try {
+			applicationContext.getAutowireCapableBeanFactory().getBean(SpringCamelContext.class);
+		} catch (NoSuchBeanDefinitionException e) {
+			setup = true;
+		}
+
+		var camelContext = SpringUtils.createBean(applicationContext, SpringCamelContext.class);
+
+		if (setup) {
+			// Set auto startup to false to prevent routes from starting automatically.
+			// This is done because it is intended that Frank configurations start and stop the routes when needed.
+			camelContext.setAutoStartup(false);
+			camelContext.addComponent("frank", new FrankComponent());
+
+			if (applicationContext instanceof Lifecycle lifecycle) {
+				lifecycle.isRunning();
+				camelContext.start();
+			}
+		}
+
+		return camelContext;
+	}
+
+	public static Stream<String> getRouteIdsFromRouteBuilder(RouteBuilder routeBuilder) {
+		return routeBuilder.getRoutes().getRoutes().stream().map(RouteDefinition::getRouteId);
+	}
+
+	public static void startRoutes(CamelContext context, RouteBuilder routeBuilder) {
+		getRouteIdsFromRouteBuilder(routeBuilder).forEach((String rId) -> {
+			try {
+				context.getRouteController().startRoute(rId);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		});
+	}
+
+	public static void stopRoutes(CamelContext context, RouteBuilder routeBuilder) {
+		getRouteIdsFromRouteBuilder(routeBuilder).forEach((String rId) -> {
+			try {
+				context.getRouteController().stopRoute(rId);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		});
 	}
 
 	public static Resource getResource(String source) throws Exception {

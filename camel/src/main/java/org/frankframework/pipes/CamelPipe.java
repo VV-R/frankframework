@@ -33,6 +33,9 @@ import org.apache.camel.spi.Resource;
 import org.apache.camel.spring.SpringCamelContext;
 import org.apache.camel.support.ResourceSupport;
 
+import org.frankframework.CamelUtils;
+import org.frankframework.configuration.AdapterAware;
+import org.frankframework.configuration.Configuration;
 import org.frankframework.configuration.ConfigurationException;
 import org.frankframework.core.Adapter;
 import org.frankframework.core.PipeLine;
@@ -47,17 +50,18 @@ import org.frankframework.util.SpringUtils;
 /**
  * Pipe that used to test reading a resource from the local (plugin) classpath.
  */
-public class CamelPipe extends FixedForwardPipe {
+public class CamelPipe extends FixedForwardPipe implements AdapterAware  {
+	private Adapter adapter;
 	private CamelContext camelContext;
 	private ProducerTemplate producerTemplate;
 	private CamelXmlRoutesBuilderLoader camelXmlRoutesBuilderLoader;
 	private String routesSource;
 	private String endpointUri;
 	private Endpoint endpoint;
+	private RouteBuilder routeBuilder;
 
 	public void setCamelContext(SpringCamelContext camelContext) {
 		this.camelContext = camelContext;
-
 	}
 
 	public void setEndpointUri(String endpointUri) {
@@ -72,7 +76,7 @@ public class CamelPipe extends FixedForwardPipe {
 	public void configure() throws ConfigurationException {
 		super.configure();
 
-		camelContext = SpringUtils.createBean(getApplicationContext(), SpringCamelContext.class);
+		camelContext = CamelUtils.createCamelContext(adapter);
 
 		producerTemplate = this.camelContext.createProducerTemplate();
 		camelXmlRoutesBuilderLoader = new CamelXmlRoutesBuilderLoader();
@@ -108,7 +112,6 @@ public class CamelPipe extends FixedForwardPipe {
 	}
 
 	private void configureRoutes() throws Exception {
-		RouteBuilder routeBuilder;
 		routeBuilder = getRouteBuilder();
 		// TODO: maybe add null check
 
@@ -167,12 +170,17 @@ public class CamelPipe extends FixedForwardPipe {
 	@Override
 	public void start() {
 		super.start();
-		camelContext.start();
+		CamelUtils.startRoutes(camelContext, routeBuilder);
 	}
 
 	@Override
 	public void stop() {
 		super.stop();
-		camelContext.stop();
+		CamelUtils.stopRoutes(camelContext, routeBuilder);
+	}
+
+	@Override
+	public void setAdapter(Adapter adapter) {
+		this.adapter = adapter;
 	}
 }
