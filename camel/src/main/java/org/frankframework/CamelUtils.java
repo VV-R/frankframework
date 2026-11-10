@@ -40,6 +40,10 @@ public class CamelUtils {
 	public static Resource getResource(String source) throws Exception {
 		URL url = org.frankframework.util.ClassLoaderUtils.getResourceURL(source);
 
+		if (url == null) {
+			throw new IllegalArgumentException("\"source\" does not point to a resource");
+		}
+
 		return new ResourceSupport("jar", url.getFile()) {
 			@Override
 			public boolean exists() {
