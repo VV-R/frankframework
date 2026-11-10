@@ -55,11 +55,6 @@ public class CamelPipe extends FixedForwardPipe {
 	private String endpointUri;
 	private Endpoint endpoint;
 
-	public void setCamelContext(SpringCamelContext camelContext) {
-		this.camelContext = camelContext;
-
-	}
-
 	public void setEndpointUri(String endpointUri) {
 		this.endpointUri = endpointUri;
 	}
