@@ -22,6 +22,10 @@ import java.io.Serializable;
 import java.net.URL;
 import java.util.Map;
 
+import lombok.Getter;
+
+import lombok.Setter;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
@@ -52,16 +56,10 @@ public class CamelPipe extends FixedForwardPipe {
 	private ProducerTemplate producerTemplate;
 	private CamelXmlRoutesBuilderLoader camelXmlRoutesBuilderLoader;
 	private String routesSource;
+	@Getter
+	@Setter
 	private String endpointUri;
 	private Endpoint endpoint;
-
-	public void setEndpointUri(String endpointUri) {
-		this.endpointUri = endpointUri;
-	}
-
-	public void setRoutesSource(String routesSource) {
-		this.routesSource = routesSource;
-	}
 
 	@Override
 	public void configure() throws ConfigurationException {
