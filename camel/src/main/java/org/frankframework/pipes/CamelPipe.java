@@ -39,12 +39,9 @@ import org.apache.camel.support.ResourceSupport;
 
 import org.frankframework.CamelUtils;
 import org.frankframework.configuration.ConfigurationException;
-import org.frankframework.core.Adapter;
-import org.frankframework.core.PipeLine;
 import org.frankframework.core.PipeLineSession;
 import org.frankframework.core.PipeRunException;
 import org.frankframework.core.PipeRunResult;
-import org.frankframework.parameters.IParameter;
 import org.frankframework.stream.Message;
 import org.frankframework.util.SpringUtils;
 
