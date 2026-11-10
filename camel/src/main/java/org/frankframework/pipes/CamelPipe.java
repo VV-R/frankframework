@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 
 import lombok.Getter;
@@ -93,12 +94,7 @@ public class CamelPipe extends FixedForwardPipe {
 	}
 
 	private Map<String, Object> serializeMap(Map<String, Serializable> input) {
-		// used this for inspiration: https://stackoverflow.com/a/56060885/
-		java.util.HashMap<String, Object> result = new java.util.HashMap<String, Object>();
-		for (Map.Entry<String, Serializable> entry : input.entrySet()) {
-			result.put(entry.getKey(), (Object) entry.getValue());
-		}
-		return result;
+		return new HashMap<>(input);
 	}
 
 	private Exchange createExchangeFromSession(PipeLineSession session) throws PipeRunException {
