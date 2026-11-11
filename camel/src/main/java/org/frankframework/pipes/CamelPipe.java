@@ -58,7 +58,6 @@ public class CamelPipe extends FixedForwardPipe {
 	private CamelXmlRoutesBuilderLoader camelXmlRoutesBuilderLoader;
 	@Setter
 	private String routesSource;
-	@Getter
 	@Setter
 	private String endpointUri;
 	private Endpoint endpoint;
