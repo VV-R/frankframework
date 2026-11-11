@@ -56,6 +56,7 @@ public class CamelPipe extends FixedForwardPipe {
 	private CamelContext camelContext;
 	private ProducerTemplate producerTemplate;
 	private CamelXmlRoutesBuilderLoader camelXmlRoutesBuilderLoader;
+	@Setter
 	private String routesSource;
 	@Getter
 	@Setter
