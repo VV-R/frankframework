@@ -20,7 +20,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
+
+import lombok.Getter;
+
+import lombok.Setter;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
@@ -33,15 +38,15 @@ import org.apache.camel.spi.Resource;
 import org.apache.camel.spring.SpringCamelContext;
 import org.apache.camel.support.ResourceSupport;
 
+import org.frankframework.CamelUtils;
 import org.frankframework.configuration.ConfigurationException;
-import org.frankframework.core.Adapter;
-import org.frankframework.core.PipeLine;
 import org.frankframework.core.PipeLineSession;
 import org.frankframework.core.PipeRunException;
 import org.frankframework.core.PipeRunResult;
-import org.frankframework.parameters.IParameter;
 import org.frankframework.stream.Message;
 import org.frankframework.util.SpringUtils;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -51,22 +56,11 @@ public class CamelPipe extends FixedForwardPipe {
 	private CamelContext camelContext;
 	private ProducerTemplate producerTemplate;
 	private CamelXmlRoutesBuilderLoader camelXmlRoutesBuilderLoader;
+	@Setter
 	private String routesSource;
+	@Setter
 	private String endpointUri;
 	private Endpoint endpoint;
-
-	public void setCamelContext(SpringCamelContext camelContext) {
-		this.camelContext = camelContext;
-
-	}
-
-	public void setEndpointUri(String endpointUri) {
-		this.endpointUri = endpointUri;
-	}
-
-	public void setRoutesSource(String routesSource) {
-		this.routesSource = routesSource;
-	}
 
 	@Override
 	public void configure() throws ConfigurationException {
@@ -86,24 +80,8 @@ public class CamelPipe extends FixedForwardPipe {
 		endpoint = camelContext.getEndpoint(endpointUri);
 	}
 
-	private Resource getRouteBuilderResource() throws Exception {
-		URL url = org.frankframework.util.ClassLoaderUtils.getResourceURL(routesSource);
-
-		return new ResourceSupport("jar", url.getFile()) {
-			@Override
-			public boolean exists() {
-				return true;
-			}
-
-			@Override
-			public InputStream getInputStream() throws IOException {
-				return url.openStream();
-			}
-		};
-	}
-
 	private RouteBuilder getRouteBuilder() throws Exception {
-		Resource resource = getRouteBuilderResource();
+		Resource resource = CamelUtils.getResource(routesSource);
 		return camelXmlRoutesBuilderLoader.doLoadRouteBuilder(resource);
 	}
 
@@ -116,12 +94,7 @@ public class CamelPipe extends FixedForwardPipe {
 	}
 
 	private Map<String, Object> serializeMap(Map<String, Serializable> input) {
-		// used this for inspiration: https://stackoverflow.com/a/56060885/
-		java.util.HashMap<String, Object> result = new java.util.HashMap<String, Object>();
-		for (Map.Entry<String, Serializable> entry : input.entrySet()) {
-			result.put(entry.getKey(), (Object) entry.getValue());
-		}
-		return result;
+		return new HashMap<>(input);
 	}
 
 	private Exchange createExchangeFromSession(PipeLineSession session) throws PipeRunException {
@@ -148,7 +121,7 @@ public class CamelPipe extends FixedForwardPipe {
 	}
 
 	@Override
-	public PipeRunResult doPipe(Message message, PipeLineSession session) throws PipeRunException {
+	public @NonNull PipeRunResult doPipe(@NonNull Message message, @NonNull PipeLineSession session) throws PipeRunException {
 		try {
 			Exchange exchange = createExchangeFromSession(session);
 

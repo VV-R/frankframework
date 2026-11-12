@@ -25,6 +25,7 @@ import org.apache.camel.support.ResourceSupport;
 
 import org.frankframework.util.SpringUtils;
 
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
@@ -40,6 +41,10 @@ public class CamelUtils {
 	public static Resource getResource(String source) throws Exception {
 		URL url = org.frankframework.util.ClassLoaderUtils.getResourceURL(source);
 
+		if (url == null) {
+			throw new IllegalArgumentException("\"source\" does not point to a resource");
+		}
+
 		return new ResourceSupport("jar", url.getFile()) {
 			@Override
 			public boolean exists() {
@@ -47,7 +52,7 @@ public class CamelUtils {
 			}
 
 			@Override
-			public InputStream getInputStream() throws IOException {
+			public @NonNull InputStream getInputStream() throws IOException {
 				return url.openStream();
 			}
 		};
