@@ -24,7 +24,9 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.dsl.xml.io.CamelXmlRoutesBuilderLoader;
 
 import org.frankframework.CamelUtils;
+import org.frankframework.configuration.AdapterAware;
 import org.frankframework.configuration.ConfigurationException;
+import org.frankframework.core.Adapter;
 import org.frankframework.core.IMessageHandler;
 import org.frankframework.core.IPushingListener;
 import org.frankframework.core.IbisExceptionListener;
@@ -51,7 +53,7 @@ import java.util.Map;
  *
  * @author Ruben van Voorden
  */
-public class CamelListener implements IPushingListener<Message>, ReceiverAware<Message> {
+public class CamelListener implements IPushingListener<Message>, ReceiverAware<Message>, AdapterAware {
 	@Getter
 	private String name;
 	private ApplicationContext applicationContext;
@@ -60,15 +62,17 @@ public class CamelListener implements IPushingListener<Message>, ReceiverAware<M
 	private IbisExceptionListener listener;
 	private String routesSource;
 	private CamelContext camelContext;
+	private Adapter adapter;
+	private RouteBuilder routesBuilder;
 
 	@Override
 	public void start() {
-		camelContext.start();
+		CamelUtils.startRoutes(camelContext, routesBuilder);
 	}
 
 	@Override
 	public void stop() {
-		camelContext.stop();
+		CamelUtils.stopRoutes(camelContext, routesBuilder);
 	}
 
 	@Override
@@ -83,15 +87,13 @@ public class CamelListener implements IPushingListener<Message>, ReceiverAware<M
 
 	@Override
 	public void configure() throws ConfigurationException {
-		RouteBuilder routesBuilder;
 		try (CamelXmlRoutesBuilderLoader camelXmlRoutesBuilderLoader = new CamelXmlRoutesBuilderLoader()) {
 			routesBuilder = camelXmlRoutesBuilderLoader.doLoadRouteBuilder(CamelUtils.getResource(routesSource));
 		} catch (Exception e) { // could IOException
 			throw new ConfigurationException(e);
 		}
 
-		camelContext = CamelUtils.createCamelContext(getApplicationContext());
-		camelContext.addComponent("frank", new FrankComponent());
+		camelContext = CamelUtils.createCamelContext(adapter);
 		camelContext.getRegistry().bind(name, this);
 		try {
 			camelContext.addRoutes(routesBuilder);
@@ -157,5 +159,10 @@ public class CamelListener implements IPushingListener<Message>, ReceiverAware<M
 	@Override
 	public Receiver<Message> getReceiver() {
 		return receiver;
+	}
+
+	@Override
+	public void setAdapter(Adapter adapter) {
+		this.adapter = adapter;
 	}
 }
