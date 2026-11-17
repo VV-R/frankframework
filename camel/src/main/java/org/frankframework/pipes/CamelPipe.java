@@ -89,6 +89,10 @@ public class CamelPipe extends FixedForwardPipe implements AdapterAware  {
 	}
 
 	private void configureRoutes() throws Exception {
+		if (routesSource == null) {
+			return;
+		}
+
 		routeBuilder = getRouteBuilder();
 		// TODO: maybe add null check
 
@@ -142,13 +146,17 @@ public class CamelPipe extends FixedForwardPipe implements AdapterAware  {
 	@Override
 	public void start() {
 		super.start();
-		CamelUtils.startRoutes(camelContext, routeBuilder);
+		if (routeBuilder != null) {
+			CamelUtils.startRoutes(camelContext, routeBuilder);
+		}
 	}
 
 	@Override
 	public void stop() {
 		super.stop();
-		CamelUtils.stopRoutes(camelContext, routeBuilder);
+		if (routeBuilder != null) {
+			CamelUtils.stopRoutes(camelContext, routeBuilder);
+		}
 	}
 
 	@Override
