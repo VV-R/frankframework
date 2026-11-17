@@ -26,14 +26,9 @@ import org.apache.camel.spring.SpringCamelContext;
 
 import org.apache.camel.support.ResourceSupport;
 
-import org.frankframework.support.FrankComponent;
-import org.frankframework.util.SpringUtils;
+import org.frankframework.core.Adapter;
 
 import org.jspecify.annotations.NonNull;
-
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.Lifecycle;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,28 +37,16 @@ import java.util.stream.Stream;
 
 @UtilityClass
 public class CamelUtils {
-	public static SpringCamelContext createCamelContext(ApplicationContext applicationContext) {
-		boolean setup = false;
-
-		try {
-			applicationContext.getAutowireCapableBeanFactory().getBean(SpringCamelContext.class);
-		} catch (NoSuchBeanDefinitionException e) {
-			setup = true;
-		}
-
-		var camelContext = SpringUtils.createBean(applicationContext, SpringCamelContext.class);
-
-		if (setup) {
-			// Set auto startup to false to prevent routes from starting automatically.
-			// This is done because it is intended that Frank configurations start and stop the routes when needed.
-			camelContext.setAutoStartup(false);
-			camelContext.addComponent("frank", new FrankComponent());
-
-			if (applicationContext instanceof Lifecycle lifecycle) {
-				lifecycle.isRunning();
-				camelContext.start();
-			}
-		}
+	/**
+	 * This method is meant to be used from a Pipe or a Listener.
+	 * It will always call the start method on {@link CamelContext}, because you
+	 * cannot know if the Spring related part of an {@link Adapter} is already
+	 * running or not, because {@link Adapter} uses two boolean values to determine
+	 * the return value for {@link Adapter#isRunning()}
+	 */
+	public static SpringCamelContext createCamelContext(Adapter adapter) {
+		var camelContext = adapter.getBean(SpringCamelContext.class);
+		camelContext.start();
 
 		return camelContext;
 	}
