@@ -67,12 +67,16 @@ public class CamelListener implements IPushingListener<Message>, ReceiverAware<M
 
 	@Override
 	public void start() {
-		CamelUtils.startRoutes(camelContext, routesBuilder);
+		if (routesBuilder != null) {
+			CamelUtils.startRoutes(camelContext, routesBuilder);
+		}
 	}
 
 	@Override
 	public void stop() {
-		CamelUtils.stopRoutes(camelContext, routesBuilder);
+		if (routesBuilder != null) {
+			CamelUtils.stopRoutes(camelContext, routesBuilder);
+		}
 	}
 
 	@Override
@@ -85,22 +89,30 @@ public class CamelListener implements IPushingListener<Message>, ReceiverAware<M
 		// Do nothing
 	}
 
-	@Override
-	public void configure() throws ConfigurationException {
+	private void setupRoutes() throws ConfigurationException {
 		try (CamelXmlRoutesBuilderLoader camelXmlRoutesBuilderLoader = new CamelXmlRoutesBuilderLoader()) {
 			routesBuilder = camelXmlRoutesBuilderLoader.doLoadRouteBuilder(CamelUtils.getResource(routesSource));
 		} catch (Exception e) { // could IOException
 			throw new ConfigurationException(e);
 		}
 
-		camelContext = CamelUtils.createCamelContext(adapter);
-		camelContext.getRegistry().bind(name, this);
 		try {
 			camelContext.addRoutes(routesBuilder);
 		} catch (Exception e) {
 			throw new ConfigurationException(
 				"something went wrong while adding routes to CamelContext", e
 			);
+		}
+	}
+
+	@Override
+	public void configure() throws ConfigurationException {
+		camelContext = CamelUtils.createCamelContext(adapter);
+
+		camelContext.getRegistry().bind(name, this);
+
+		if (routesSource != null) {
+			setupRoutes();
 		}
 	}
 
