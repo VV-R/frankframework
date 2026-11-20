@@ -18,10 +18,7 @@ package org.frankframework.pipes;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 import lombok.Getter;
 
@@ -93,10 +90,6 @@ public class CamelPipe extends FixedForwardPipe {
 		camelContext.addRoutes(routeBuilder);
 	}
 
-	private Map<String, Object> serializeMap(Map<String, Serializable> input) {
-		return new HashMap<>(input);
-	}
-
 	private Exchange createExchangeFromSession(PipeLineSession session) throws PipeRunException {
 		Exchange exchange = endpoint.createExchange(ExchangePattern.InOut);
 
@@ -110,8 +103,7 @@ public class CamelPipe extends FixedForwardPipe {
 
 	private void setupExchangeInMessage(Exchange exchange, Message message) throws IOException {
 		org.apache.camel.Message inMsg = exchange.getIn();
-		inMsg.setHeaders(serializeMap(message.getContext().getAll()));
-		inMsg.setBody(message.asString());
+		CamelUtils.convertFrankMessageToCamelMessage(message, inMsg);
 	}
 
 	private Message convertResponseExchangeToFrankMessage(Exchange exchange) {

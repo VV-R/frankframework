@@ -30,7 +30,10 @@ import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 @UtilityClass
 public class CamelUtils {
@@ -56,5 +59,17 @@ public class CamelUtils {
 				return url.openStream();
 			}
 		};
+	}
+
+	public static void convertFrankMessageToCamelMessage(
+		org.frankframework.stream.Message frankMsg,
+		org.apache.camel.Message camelMsg
+	) throws IOException {
+		camelMsg.setHeaders(serializeMap(frankMsg.getContext().getAll()));
+		camelMsg.setBody(frankMsg.asString());
+	}
+
+	private static Map<String, Object> serializeMap(Map<String, Serializable> input) {
+		return new HashMap<>(input);
 	}
 }

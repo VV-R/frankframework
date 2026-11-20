@@ -66,4 +66,13 @@
 			</SenderPipe>
 		</Pipeline>
 	</Adapter>
+	<Adapter name="TestCamelListenerResponse">
+		<Receiver name="testReceiver">
+			<Listener className="org.frankframework.listeners.CamelListener" routesSource="camelListenerRoutesResp.xml" name="camelListenerTwo"/>
+		</Receiver>
+		<Pipeline>
+			<EchoPipe name="respPipe" getInputFromFixedValue="Here is your response!"/>
+		</Pipeline>
+	</Adapter>
 </Configuration>
+
