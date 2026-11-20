@@ -21,6 +21,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Producer;
 import org.apache.camel.support.DefaultProducer;
 
+import org.frankframework.CamelUtils;
 import org.frankframework.core.PipeLineSession;
 import org.frankframework.listeners.CamelListener;
 import org.frankframework.stream.Message;
@@ -49,6 +50,8 @@ public class FrankProducer extends DefaultProducer {
 		// This is the only way to set the message context at the moment.
 		frankMsg.getContext().putAll((Map<String, Serializable>)(Map)exchange.getMessage().getHeaders());
 
-		camelListener.processMessage(frankMsg, session);
+		Message msg = camelListener.processMessage(frankMsg, session);
+		org.apache.camel.Message outMsg = exchange.getMessage();
+		CamelUtils.convertFrankMessageToCamelMessage(msg, outMsg);
 	}
 }
