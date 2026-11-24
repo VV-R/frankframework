@@ -28,6 +28,7 @@ import org.apache.camel.support.ResourceSupport;
 
 import org.frankframework.core.Adapter;
 
+import org.frankframework.lifecycle.LifecycleException;
 import org.frankframework.support.FrankComponent;
 
 import org.frankframework.util.SpringUtils;
@@ -85,7 +86,7 @@ public class CamelUtils {
 			try {
 				context.getRouteController().startRoute(rId);
 			} catch (Exception e) {
-				throw new RuntimeException(e);
+				throw new LifecycleException(e);
 			}
 		});
 	}
@@ -95,7 +96,7 @@ public class CamelUtils {
 			try {
 				context.getRouteController().stopRoute(rId);
 			} catch (Exception e) {
-				throw new RuntimeException(e);
+				throw new LifecycleException(e);
 			}
 		});
 	}
