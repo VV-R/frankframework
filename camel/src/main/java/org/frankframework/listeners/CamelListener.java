@@ -37,8 +37,6 @@ import org.frankframework.receivers.Receiver;
 import org.frankframework.receivers.ReceiverAware;
 import org.frankframework.stream.Message;
 
-import org.frankframework.support.FrankComponent;
-
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -91,7 +89,6 @@ public class CamelListener implements IPushingListener<Message>, ReceiverAware<M
 		}
 
 		camelContext = CamelUtils.createCamelContext(getApplicationContext());
-		camelContext.addComponent("frank", new FrankComponent());
 		camelContext.getRegistry().bind(name, this);
 		try {
 			camelContext.addRoutes(routesBuilder);

@@ -11,6 +11,10 @@
 		<to uri="dns:ip"/>
 		<convertBodyTo type="String"/>
 	</route>
+	<route id="IPCheck-from-Frank">
+		<from uri="frank:in-dns"/>
+		<to uri="direct:in-dns"/>
+	</route>
 	<route id="docker">
 		<!-- does not work (yet) -->
 		<from uri="direct:in-docker"/>

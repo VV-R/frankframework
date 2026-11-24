@@ -23,6 +23,7 @@ import org.apache.camel.spring.SpringCamelContext;
 
 import org.apache.camel.support.ResourceSupport;
 
+import org.frankframework.support.FrankComponent;
 import org.frankframework.util.SpringUtils;
 
 import org.jspecify.annotations.NonNull;
@@ -35,7 +36,9 @@ import java.net.URL;
 @UtilityClass
 public class CamelUtils {
 	public static SpringCamelContext createCamelContext(ApplicationContext applicationContext) {
-		return SpringUtils.createBean(applicationContext, SpringCamelContext.class);
+		var camelContext = SpringUtils.createBean(applicationContext, SpringCamelContext.class);
+		camelContext.addComponent("frank", new FrankComponent());
+		return camelContext;
 	}
 
 	public static Resource getResource(String source) throws Exception {
