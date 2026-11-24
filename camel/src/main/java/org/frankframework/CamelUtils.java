@@ -24,7 +24,6 @@ import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.spi.Resource;
 import org.apache.camel.spring.SpringCamelContext;
 
-import org.apache.camel.support.LifecycleStrategySupport;
 import org.apache.camel.support.ResourceSupport;
 
 import org.frankframework.core.Adapter;
@@ -58,14 +57,6 @@ public class CamelUtils {
 
 			camelContext.setAutoStartup(false);
 			camelContext.addComponent("frank", new FrankComponent());
-
-			camelContext.addLifecycleStrategy(new LifecycleStrategySupport() {
-				@Override
-				public void onContextStopped(CamelContext context) {
-					super.onContextStopped(context);
-					System.out.println(context.getName() + " stopped");
-				}
-			});
 		}
 
 		return camelContext;
