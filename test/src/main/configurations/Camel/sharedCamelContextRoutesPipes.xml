@@ -1,0 +1,15 @@
+<routes xmlns="http://camel.apache.org/schema/xml-io">
+	<route id="shared-camelcontext-uppercase">
+		<from uri="direct:in-upper"/>
+		<setBody>
+			<simple>${body.toUpperCase()}</simple>
+		</setBody>
+	</route>
+
+	<route id="shared-camelcontext-append">
+		<from uri="direct:in-append"/>
+		<setBody>
+			<simple>${body.concat("TAIL")}</simple>
+		</setBody>
+	</route>
+</routes>

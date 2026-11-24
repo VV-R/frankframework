@@ -66,4 +66,28 @@
 			</SenderPipe>
 		</Pipeline>
 	</Adapter>
+	<Adapter name="SharedCamelContextTest">
+		<Receiver name="testReceiver">
+			<ApiListener name="testListener" uriPattern="camel-append-upper" methods="put,post" allowAllParams="false"/>
+		</Receiver>
+		<Receiver name="testReceiver2">
+			<Listener className="org.frankframework.listeners.CamelListener" routesSource="sharedCamelContextRoutesListener.xml" name="shared-camelcontext"/>
+		</Receiver>
+		<Receiver name="testReceiver3">
+			<Listener className="org.frankframework.listeners.CamelListener" name="phony"/>
+		</Receiver>
+		<Pipeline>
+			<Pipe
+				name="camel-pipe-upper" className="org.frankframework.pipes.CamelPipe"
+				routesSource="sharedCamelContextRoutesPipes.xml"
+				endpointUri="direct:in-append"
+			/>
+			<!-- As you can see, not routesSource in the pipe below (it's all shared) -->
+			<Pipe
+				name="camel-pipe-append" className="org.frankframework.pipes.CamelPipe"
+				endpointUri="direct:in-upper"
+			/>
+		</Pipeline>
+
+	</Adapter>
 </Configuration>

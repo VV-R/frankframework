@@ -1,0 +1,10 @@
+<routes xmlns="http://camel.apache.org/schema/xml-io">
+	<route id="shared-camelcontext-listener">
+		<from uri="timer:shared-camelcontext?period=10000"/>
+		<setBody>
+			<constant>shared camelcontext</constant>
+		</setBody>
+		<to uri="frank:shared-camelcontext"/>
+		<to uri="log:info"/>
+	</route>
+</routes>
