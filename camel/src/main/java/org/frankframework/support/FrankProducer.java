@@ -50,7 +50,11 @@ public class FrankProducer extends DefaultProducer {
 		// This is the only way to set the message context at the moment.
 		frankMsg.getContext().putAll((Map<String, Serializable>)(Map)exchange.getMessage().getHeaders());
 
-		Message msg = camelListener.processMessage(frankMsg, session);
+		// Some Camel components can also store correlation ids in headers, in such case the integration builder should get them from there.
+		// See the following for more info: https://camel.apache.org/components/4.22.x/eips/correlation-identifier.html
+		var correlationId = exchange.getProperty("Exchange.CORRELATION_ID", String.class);
+
+		Message msg = camelListener.processMessage(frankMsg, session, correlationId);
 		org.apache.camel.Message outMsg = exchange.getMessage();
 		CamelUtils.convertFrankMessageToCamelMessage(msg, outMsg);
 	}

@@ -40,6 +40,7 @@ import org.frankframework.stream.Message;
 import org.frankframework.support.FrankComponent;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 
@@ -102,8 +103,8 @@ public class CamelListener implements IPushingListener<Message>, ReceiverAware<M
 		}
 	}
 
-	public Message processMessage(Message message, PipeLineSession session) throws ListenerException {
-		return receiver.processRequest(this, new MessageWrapper<Message>(message, session.getMessageId(), null), session);
+	public Message processMessage(Message message, PipeLineSession session, @Nullable String correlationId) throws ListenerException {
+		return receiver.processRequest(this, new MessageWrapper<Message>(message, session.getMessageId(), correlationId), session);
 	}
 
 	@Override
