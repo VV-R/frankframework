@@ -102,8 +102,7 @@ public class CamelPipe extends FixedForwardPipe {
 	}
 
 	private void setupExchangeInMessage(Exchange exchange, Message message) throws IOException {
-		org.apache.camel.Message inMsg = exchange.getIn();
-		CamelUtils.convertFrankMessageToCamelMessage(message, inMsg);
+		CamelUtils.convertFrankMessageToCamelMessage(message, exchange.getIn());
 	}
 
 	private Message convertResponseExchangeToFrankMessage(Exchange exchange) {
