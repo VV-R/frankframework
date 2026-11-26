@@ -99,8 +99,8 @@ public class CamelListener implements IPushingListener<Message>, ReceiverAware<M
 		}
 	}
 
-	public void processMessage(Message message, PipeLineSession session) throws ListenerException {
-		receiver.processRequest(this, new MessageWrapper<Message>(message, session.getMessageId(), null), session);
+	public Message processMessage(Message message, PipeLineSession session) throws ListenerException {
+		return receiver.processRequest(this, new MessageWrapper<Message>(message, session.getMessageId(), null), session);
 	}
 
 	@Override

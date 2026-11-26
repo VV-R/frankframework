@@ -15,7 +15,6 @@
 */
 package org.frankframework.pipes;
 
-
 import lombok.Setter;
 
 import org.apache.camel.Exchange;

@@ -114,9 +114,7 @@ public abstract class AbstractCamelPipe extends FixedForwardPipe {
 	}
 
 	protected void setupExchangeInMessage(Exchange exchange, Message message) throws IOException {
-		org.apache.camel.Message inMsg = exchange.getIn();
-		inMsg.setHeaders(serializeMap(message.getContext().getAll()));
-		inMsg.setBody(message.asString());
+		CamelUtils.convertFrankMessageToCamelMessage(message, exchange.getIn());
 	}
 
 	protected Message convertResponseExchangeToFrankMessage(Exchange exchange) {
