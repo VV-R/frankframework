@@ -18,25 +18,48 @@ package org.frankframework.support;
 import org.apache.camel.Endpoint;
 import org.apache.camel.support.DefaultComponent;
 
+import org.apache.camel.support.service.ServiceHelper;
+
 import org.frankframework.listeners.CamelListener;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * The FrankComponent is for binding {@link CamelListener}s to Camel message exchanges based on {@link CamelListener#name} attribute.
  */
 public class FrankComponent extends DefaultComponent {
+	private final ConcurrentMap<String, FrankConsumer> consumers = new ConcurrentHashMap<>();
+
 	@Override
 	protected Endpoint createEndpoint(
 		String uri,
 		// the part after the scheme and before the query parameters (if any), e.g. "scheme:{remaining}", like the path
 		String remaining,
 		Map<String, Object> parameters
-	) throws Exception {
-		CamelListener listener = getCamelContext().getRegistry().lookupByNameAndType(remaining, CamelListener.class);
-		if (listener == null) {
-			throw new IllegalStateException("Can not find CamelListener with name [" + remaining + "]");
+	) {
+		return new FrankEndpoint(uri, this);
+	}
+
+	@Override
+	protected void doShutdown() throws Exception {
+		ServiceHelper.stopAndShutdownService(consumers);
+		consumers.clear();
+		super.doShutdown();
+	}
+
+	public void addConsumer(String key, FrankConsumer consumer) {
+		if (consumers.putIfAbsent(key, consumer) != null) {
+			throw new IllegalArgumentException(String.format("Cannot create a second consumer with endpoint %s", key));
 		}
-		return new FrankEndpoint(uri, this, listener);
+	}
+
+	public void removeConsumer(String key, FrankConsumer consumer) {
+		consumers.remove(key, consumer);
+	}
+
+	public FrankConsumer getConsumer(String key) {
+		return consumers.get(key);
 	}
 }

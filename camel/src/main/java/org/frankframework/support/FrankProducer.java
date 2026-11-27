@@ -18,14 +18,12 @@ package org.frankframework.support;
 
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
-import org.apache.camel.Producer;
 import org.apache.camel.support.DefaultProducer;
 
 import org.frankframework.CamelUtils;
 import org.frankframework.core.PipeLineSession;
 import org.frankframework.listeners.CamelListener;
 import org.frankframework.stream.Message;
-import org.frankframework.stream.MessageContext;
 
 import java.io.Serializable;
 import java.util.Map;

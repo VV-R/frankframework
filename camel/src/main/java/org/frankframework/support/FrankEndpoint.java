@@ -16,14 +16,12 @@
 
 package org.frankframework.support;
 
-import jakarta.ws.rs.NotSupportedException;
-
-import org.apache.camel.Component;
 import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
 import org.apache.camel.support.DefaultEndpoint;
 
+import org.apache.camel.util.StringHelper;
 import org.frankframework.listeners.CamelListener;
 
 import org.jspecify.annotations.NonNull;
@@ -32,21 +30,34 @@ import org.jspecify.annotations.NonNull;
  * Send messages to a Frank!Framework configuration.
  */
 public class FrankEndpoint extends DefaultEndpoint {
-	private CamelListener listener;
+	private final String key;
 
-	public FrankEndpoint(String endpointUri, Component component, CamelListener listener) {
+	/**
+	 * Example input: {@literal "frank://abc?key=value"};
+	 * Example output: {@literal "abc"};
+	 */
+	private String extractKey(String endpointUri) {
+		String intermediate = StringHelper.before(endpointUri, "?", endpointUri);
+		return StringHelper.after(intermediate, "frank://", intermediate);
+	}
+
+	public FrankEndpoint(String endpointUri, FrankComponent component) {
 		super(endpointUri, component);
-		this.listener = listener;
+		this.key = extractKey(endpointUri);
 	}
 
 	@Override
 	public @NonNull Producer createProducer() throws Exception {
+		CamelListener listener = getCamelContext().getRegistry().lookupByNameAndType(key, CamelListener.class);
+		if (listener == null) {
+			throw new IllegalStateException("Can not find CamelListener with name [" + key + "]");
+		}
+
 		return new FrankProducer(listener, this);
 	}
 
 	@Override
-	public @NonNull Consumer createConsumer(@NonNull Processor processor) throws UnsupportedOperationException {
-		// inspired from: https://github.com/apache/camel/blob/30afcab269af9841d34bb6d8058bc0b0016a1c05/components/camel-tika/src/main/java/org/apache/camel/component/tika/TikaEndpoint.java#L69
-		throw new UnsupportedOperationException("Consumer is not supported for Frank endpoint");
+	public @NonNull Consumer createConsumer(@NonNull Processor processor) throws Exception {
+		return new FrankConsumer(this, processor, key);
 	}
 }

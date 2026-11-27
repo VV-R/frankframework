@@ -12,7 +12,7 @@
 		<Pipe
 			name="camel-pipe" className="org.frankframework.pipes.CamelPipe"
 			routesSource="camelRoutes.xml"
-			endpointUri="direct:in-dns"
+			endpointName="in-dns"
 		/>
     </Pipeline>
   </Adapter>
@@ -22,7 +22,7 @@
 		</Receiver>
 		<Pipeline>
 			<Pipe
-				name="camel-pipe" className="org.frankframework.pipes.CamelPipe"
+				name="camel-pipe" className="org.frankframework.pipes.CamelEndpointPipe"
 				routesSource="camelRoutes.xml"
 				endpointUri="direct:in-dns"
 			/>
@@ -34,7 +34,7 @@
 		</Receiver>
 		<Pipeline>
 			<Pipe
-				name="camel-pipe" className="org.frankframework.pipes.CamelPipe"
+				name="camel-pipe" className="org.frankframework.pipes.CamelEndpointPipe"
 				routesSource="camelRoutes.xml"
 				endpointUri="direct:in-docker"
 			/>
@@ -50,7 +50,7 @@
 				getInputFromFixedValue="Hello to Camel from Frank!"
 			/>
 			<Pipe
-				name="camel-pipe" className="org.frankframework.pipes.CamelPipe"
+				name="camel-pipe" className="org.frankframework.pipes.CamelEndpointPipe"
 				routesSource="camelRoutes.xml"
 				endpointUri="direct:in-log"
 			/>

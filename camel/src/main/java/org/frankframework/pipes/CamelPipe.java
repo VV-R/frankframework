@@ -15,128 +15,65 @@
 */
 package org.frankframework.pipes;
 
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-
-import lombok.Getter;
-
 import lombok.Setter;
 
-import org.apache.camel.CamelContext;
-import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
-import org.apache.camel.ExchangePattern;
-import org.apache.camel.ProducerTemplate;
-import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.dsl.xml.io.CamelXmlRoutesBuilderLoader;
-import org.apache.camel.spi.Resource;
-import org.apache.camel.spring.SpringCamelContext;
-import org.apache.camel.support.ResourceSupport;
 
-import org.frankframework.CamelUtils;
 import org.frankframework.configuration.ConfigurationException;
+import org.frankframework.core.ParameterException;
 import org.frankframework.core.PipeLineSession;
 import org.frankframework.core.PipeRunException;
 import org.frankframework.core.PipeRunResult;
+import org.frankframework.parameters.ParameterList;
+import org.frankframework.parameters.ParameterValue;
 import org.frankframework.stream.Message;
-import org.frankframework.util.SpringUtils;
+import org.frankframework.support.FrankComponent;
+import org.frankframework.support.FrankConsumer;
 
-import org.jspecify.annotations.NonNull;
 
-
-/**
- * Pipe that used to test reading a resource from the local (plugin) classpath.
- */
-public class CamelPipe extends FixedForwardPipe {
-	private CamelContext camelContext;
-	private ProducerTemplate producerTemplate;
-	private CamelXmlRoutesBuilderLoader camelXmlRoutesBuilderLoader;
-	@Setter
-	private String routesSource;
-	@Setter
-	private String endpointUri;
-	private Endpoint endpoint;
+public class CamelPipe extends AbstractCamelPipe {
+	@Setter private String endpointName;
 
 	@Override
 	public void configure() throws ConfigurationException {
-		super.configure();
-
-		camelContext = SpringUtils.createBean(getApplicationContext(), SpringCamelContext.class);
-
-		producerTemplate = this.camelContext.createProducerTemplate();
-		camelXmlRoutesBuilderLoader = new CamelXmlRoutesBuilderLoader();
-
-		try {
-			configureRoutes();
-		} catch (Exception e) {
-			throw new ConfigurationException(e);
+		if (endpointName == null) {
+			throw new ConfigurationException("endpointName must be set");
 		}
 
-		endpoint = camelContext.getEndpoint(endpointUri);
+		super.configure();
+
+		endpoint = camelContext.getEndpoint("frank:" + endpointName);
 	}
 
-	private RouteBuilder getRouteBuilder() throws Exception {
-		Resource resource = CamelUtils.getResource(routesSource);
-		return camelXmlRoutesBuilderLoader.doLoadRouteBuilder(resource);
-	}
+	private void copyParamsToExchange(Message message, PipeLineSession session, Exchange exchange) throws ParameterException {
+		ParameterList parameterList = getParameterList();
 
-	private void configureRoutes() throws Exception {
-		RouteBuilder routeBuilder;
-		routeBuilder = getRouteBuilder();
-		// TODO: maybe add null check
-
-		camelContext.addRoutes(routeBuilder);
-	}
-
-	private Exchange createExchangeFromSession(PipeLineSession session) throws PipeRunException {
-		Exchange exchange = endpoint.createExchange(ExchangePattern.InOut);
-
-		String messageId = session.getMessageId();
-		if (messageId == null)
-			throw new PipeRunException(this, "Pipe line session message id should not be null");
-		exchange.setExchangeId(messageId);
-
-		return exchange;
-	}
-
-	private void setupExchangeInMessage(Exchange exchange, Message message) throws IOException {
-		CamelUtils.convertFrankMessageToCamelMessage(message, exchange.getIn());
-	}
-
-	private Message convertResponseExchangeToFrankMessage(Exchange exchange) {
-//		ExchangeHelper.extractResultBody may be useful
-		Object resultBody = exchange.getOut().getBody();
-		return Message.asMessage(resultBody);
+		for (ParameterValue param : parameterList.getValues(message, session)) {
+			exchange.setVariable(param.getName(), param.getValue());
+		}
 	}
 
 	@Override
-	public @NonNull PipeRunResult doPipe(@NonNull Message message, @NonNull PipeLineSession session) throws PipeRunException {
+	public PipeRunResult doPipe(Message message, PipeLineSession session) throws PipeRunException {
 		try {
+
 			Exchange exchange = createExchangeFromSession(session);
 
 			setupExchangeInMessage(exchange, message);
 
-			Exchange responseExchange = producerTemplate.send(endpoint, exchange);
+			copyParamsToExchange(message, session, exchange);
+
+//			Exchange responseExchange = producerTemplate.send(endpoint, exchange);
+
+			FrankComponent component = camelContext.getComponent("frank", FrankComponent.class);
+			FrankConsumer consumer = component.getConsumer(endpointName);
+			consumer.getProcessor().process(exchange);
 
 			return new PipeRunResult(
-				getSuccessForward(), convertResponseExchangeToFrankMessage(responseExchange)
+				getSuccessForward(), convertResponseExchangeToFrankMessage(exchange)
 			);
 		} catch (Exception e) {
 			throw new PipeRunException(this, "something went wrong relaying message to Camel", e);
 		}
-	}
-
-	@Override
-	public void start() {
-		super.start();
-		camelContext.start();
-	}
-
-	@Override
-	public void stop() {
-		super.stop();
-		camelContext.stop();
 	}
 }
