@@ -32,6 +32,10 @@ import org.jspecify.annotations.NonNull;
 public class FrankEndpoint extends DefaultEndpoint {
 	private final String key;
 
+	/**
+	 * Example input: {@literal "frank://abc?key=value"};
+	 * Example output: {@literal "abc"};
+	 */
 	private String extractKey(String endpointUri) {
 		String intermediate = StringHelper.before(endpointUri, "?", endpointUri);
 		return StringHelper.after(intermediate, "frank://", intermediate);
