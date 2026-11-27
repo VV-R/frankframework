@@ -29,9 +29,6 @@ import org.frankframework.stream.Message;
 import org.jspecify.annotations.NonNull;
 
 
-/**
- * Pipe that used to test reading a resource from the local (plugin) classpath.
- */
 public class CamelEndpointPipe extends AbstractCamelPipe {
 	@Setter
 	private String endpointUri;

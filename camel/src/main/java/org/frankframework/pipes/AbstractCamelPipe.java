@@ -42,9 +42,6 @@ import org.frankframework.core.PipeRunException;
 import org.frankframework.stream.Message;
 
 
-/**
- * Pipe that used to test reading a resource from the local (plugin) classpath.
- */
 public abstract class AbstractCamelPipe extends FixedForwardPipe {
 	protected CamelContext camelContext;
 	protected ProducerTemplate producerTemplate;

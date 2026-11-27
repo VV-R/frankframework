@@ -31,9 +31,6 @@ import org.frankframework.support.FrankComponent;
 import org.frankframework.support.FrankConsumer;
 
 
-/**
- * Pipe that used to test reading a resource from the local (plugin) classpath.
- */
 public class CamelPipe extends AbstractCamelPipe {
 	@Setter private String endpointName;
 
