@@ -43,7 +43,6 @@ public class FrankEndpoint extends DefaultEndpoint {
 
 	public FrankEndpoint(String endpointUri, FrankComponent component) {
 		super(endpointUri, component);
-//		this.key = StringHelper.before(endpointUri, "?", endpointUri);
 		this.key = extractKey(endpointUri);
 	}
 
